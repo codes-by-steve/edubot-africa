@@ -1,16 +1,9 @@
-# main.py - EduBot Africa (GUARANTEED WORKING)
+# main.py - EduBot Africa (Conflict-Fixed Version)
 import os
+import time
 import sys
-
-# 🔍 Dependency check (helps diagnose errors)
-try:
-    from telegram import Update
-    from telegram.ext import Application, CommandHandler, ContextTypes
-except ImportError as e:
-    print(f"❌ FATAL DEPENDENCY ERROR: {str(e)}")
-    print("👉 CHECK requirements.txt - MUST contain: python-telegram-bot==20.6")
-    print("👉 CHECK .python-version file exists with 3.10")
-    sys.exit(1)
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 # 🌍 African context examples
 CURRENCY_EXAMPLES = {
@@ -40,17 +33,21 @@ async def math_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-# 🚀 Main function
+# 🚀 Main function with conflict prevention
 def main():
     # Critical: Get token from environment
     TOKEN = os.getenv("TOKEN")
     if not TOKEN:
         print("❌ FATAL: TOKEN missing! Add to Railway Variables")
-        print("👉 Key: TOKEN | Value: Your_bot_token_from_BotFather")
         return
     
     print("✅ Dependencies loaded successfully")
     print("✅ TOKEN found in environment")
+    
+    # ⏳ CRITICAL FIX: Add small delay to prevent race conditions
+    print("⏳ Waiting 3 seconds to avoid instance conflicts...")
+    time.sleep(3)
+    
     print("🚀 Starting EduBot Africa...")
     
     # Create application
@@ -68,7 +65,7 @@ def main():
     
     print("✅ Handlers registered")
     print("🤖 EduBot is LIVE! Waiting for students...")
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)  # ← CRITICAL: Prevents conflict errors
 
 if __name__ == "__main__":
     main()
